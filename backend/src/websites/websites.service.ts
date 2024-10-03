@@ -34,4 +34,8 @@ export class WebsitesService {
   findNext(currentUrl: string) {
     return this.prisma.website.findUnique({ where: {url: currentUrl}})
   }
+
+  findRandom(excludeUrl: string) {
+    return this.prisma.website.findFirst()
+  }
 }

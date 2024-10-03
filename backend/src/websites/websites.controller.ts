@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { WebsitesService } from './websites.service';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { WebsiteEntity } from './entities/website.entity';
 
 @Controller('websites')
@@ -16,6 +16,7 @@ export class WebsitesController {
   // }
 
   @Get()
+  @ApiOperation({ description: 'Websites sorted in order' })
   @ApiOkResponse({ type: WebsiteEntity, isArray: true })
   findAll() {
     return this.websitesService.findAll();
@@ -46,5 +47,12 @@ export class WebsitesController {
   @ApiOkResponse({ type: WebsiteEntity })
   findNext(@Query('current') currentUrl: string) {
     return this.websitesService.findNext(currentUrl)
+  }
+
+  @Get('random')
+  @ApiQuery({ name: 'exclude', required: false })
+  @ApiOkResponse({ type: WebsiteEntity })
+  findRandom(@Query('exclude') excludeUrl?: string) {
+    return this.websitesService.findRandom(excludeUrl)
   }
 }
