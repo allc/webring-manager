@@ -28,4 +28,14 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     }
   }
+
+  async register(email: string, name: string, pass: string) {
+    let user = await this.userService.create(email, name, pass);
+    const userCount = await this.userService.countAll();
+    if (userCount == 1) {
+      user = await this.userService.makeSuperuser(user.email);
+    }
+    const { password, ...result } = user;
+    return result;
+  }
 }
