@@ -31,7 +31,8 @@ export class AuthService {
     }
   }
 
-  async register(email: string, name: string, pass: string) {
+  async signup(email: string, name: string, pass: string) {
+    //TODO: validate email
     const passwordHash = await this.hashPassword(pass);
     let user = await this.userService.create(email, name, passwordHash);
     const userCount = await this.userService.countAll();
