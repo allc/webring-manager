@@ -12,18 +12,19 @@ export default function Page() {
 
   const handleSubmit = async (values: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/signup`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(values),
       });
+      const json = await response.json();
       if (response.ok) {
-        alert('User registered');
-        router.push('/auth/login');
+        alert('Logged in');
+        localStorage.setItem('access_token', json.access_token);
+        router.push('/');
       } else {
-        const json = await response.json();
         alert(json.message);
       }
     } catch(e: any) {
@@ -43,13 +44,6 @@ export default function Page() {
       />
       <TextInput
         required
-        label="Name"
-        placeholder="Name"
-        key={form.key('name')}
-        {...form.getInputProps('name')}
-      />
-      <TextInput
-        required
         type='password'
         label="Password"
         placeholder="Password"
@@ -57,7 +51,7 @@ export default function Page() {
         {...form.getInputProps('password')}
       />
       <Group justify="center" mt="md">
-        <Button type="submit">Sign Up</Button>
+        <Button type="submit">Login</Button>
       </Group>
     </form>
   )

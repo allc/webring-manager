@@ -1,11 +1,12 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { UnstyledButton } from '@mantine/core'
 
 const Title = () => (
   <Link href='/'>
-    Webring
+    Webring Manager
   </Link>
 )
 
@@ -27,7 +28,14 @@ const NavLink = ({
 )
 
 const NavBar = () => {
-  const pathname = usePathname()
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const logout = () => {
+    localStorage.removeItem('access_token');
+    alert('Logged out');
+    router.push('/')
+  }
 
   return (
     <nav className="sticky top-0 z-[100]  p-0 w-screen border-b-border border-b-2">
@@ -47,6 +55,9 @@ const NavBar = () => {
               isActive={pathname === link.href}
             />
           ))}
+          <UnstyledButton className={`hover:opacity-100 opacity-50`} onClick={logout}>
+            Logout
+          </UnstyledButton>
         </div>
       </div>
     </nav>
