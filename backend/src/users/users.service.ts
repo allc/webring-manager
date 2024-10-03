@@ -6,21 +6,23 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  create(email: string, name: string, pass: string) {
-    return this.prisma.user.create({
-      data: {
-        email: email,
-        name: name,
-        password: pass,
-      }
-    }).catch(e => {
+  async create(email: string, name: string, pass: string) {
+    try {
+      return await this.prisma.user.create({
+        data: {
+          email: email,
+          name: name,
+          password: pass,
+        }
+      });
+    } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code == 'P2002') {
           throw new BadRequestException('User with this email already exist');
         }
       }
       throw e;
-    })
+    }
   }
 
   findOne(email: string) {
