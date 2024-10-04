@@ -4,7 +4,7 @@ import "./globals.css";
 import '@mantine/core/styles.css';
 
 import { AppShell, ColorSchemeScript, Container, MantineProvider } from '@mantine/core';
-import NavBar from "@/components/Navbar";
+import NavBar from "@/components/NavBar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Checkbox, Group, TextInput } from '@mantine/core';
+import { Button, Checkbox, Group, PasswordInput, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
 
@@ -48,9 +48,8 @@ export default function Page() {
         key={form.key('name')}
         {...form.getInputProps('name')}
       />
-      <TextInput
+      <PasswordInput
         required
-        type='password'
         label="Password"
         placeholder="Password"
         key={form.key('password')}
