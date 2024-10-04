@@ -1,20 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards, Request } from '@nestjs/common';
 import { WebsitesService } from './websites.service';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
 import { ApiOkResponse, ApiOperation, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { WebsiteEntity } from './entities/website.entity';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAnonymousAuthGuard } from 'src/auth/jwt-anonymous.guard';
 
 @Controller('websites')
 @ApiTags('websites')
 export class WebsitesController {
   constructor(private readonly websitesService: WebsitesService) {}
 
-  // @Post()
-  // create(@Body() createWebsiteDto: CreateWebsiteDto) {
-  //   return this.websitesService.create(createWebsiteDto);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  create(@Request() req, @Body() createWebsiteDto: CreateWebsiteDto) {
+    return this.websitesService.create(req.user, createWebsiteDto);
+  }
 
+  @UseGuards(JwtAnonymousAuthGuard)
   @Get()
   @ApiOperation({ description: 'Websites sorted in order' })
   @ApiOkResponse({ type: WebsiteEntity, isArray: true })
