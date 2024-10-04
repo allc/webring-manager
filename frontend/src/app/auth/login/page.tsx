@@ -30,7 +30,7 @@ export default function Page() {
     } catch(e: any) {
       alert(e.message);
     }
-  }
+  };
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
