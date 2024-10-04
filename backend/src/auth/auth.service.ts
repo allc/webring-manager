@@ -22,6 +22,7 @@ export class AuthService {
   //TODO: use DTO for type
   async login(user) {
     const payload = {
+      sub: user.id,
       email: user.email,
       name: user.name,
       superuser: user.superuser,

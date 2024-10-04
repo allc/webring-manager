@@ -1,6 +1,7 @@
-import { Body, Controller, HttpCode, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -18,5 +19,11 @@ export class AuthController {
   //TODO: use DTO for type
   signup(@Body() body) {
     return this.authService.signup(body.email, body.name, body.password);
+  }
+
+  @Get('user')
+  @UseGuards(JwtAuthGuard)
+  getUser(@Request() req) {
+    return req.user;
   }
 }
