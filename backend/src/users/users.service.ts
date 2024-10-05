@@ -43,4 +43,15 @@ export class UsersService {
       },
     })
   }
+
+  findWebsites(userId: number) {
+    return this.prisma.website.findMany({
+      where: {
+        ownerId: userId,
+      },
+      orderBy: {
+        ordering: 'asc',
+      }
+    })
+  }
 }

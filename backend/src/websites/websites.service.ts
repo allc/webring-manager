@@ -9,6 +9,7 @@ export class WebsitesService {
   constructor(private prisma: PrismaService) {}
 
   async create(user, createWebsiteDto: CreateWebsiteDto) {
+    //TODO: possibly make atomic?
     const lastOrdering = await this.findLastOrdering();
     const ordering = Math.ceil(lastOrdering) + 1;
     try {
