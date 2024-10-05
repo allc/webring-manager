@@ -49,7 +49,8 @@ const NavBar = () => {
         </div>
         <div className="flex space-x-8 px-2">
           {[
-            { href: '/websites', label: 'My Websites' },
+            { href: '/websites', label: 'Websites' },
+            { href: '/my-websites', label: 'My Websites' },
             { href: '/auth/login', label: 'Login' },
             { href: '/auth/signup', label: 'Sign-up' },
           ].map((link) => (

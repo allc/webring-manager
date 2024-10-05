@@ -13,10 +13,14 @@ export default function Page() {
   const router = useRouter();
   const [user, setUser] = useContext(UserContext);
   const [websites, setWebsites] = useState<any[]>([]);
+  const [opened, { open, close }] = useDisclosure(false);
+  const form = useForm({
+    mode: 'uncontrolled',
+  });
 
   const loadWebsites = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users/${user.sub}/websites`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -33,6 +37,28 @@ export default function Page() {
       alert(e.message);
     }
   }
+
+  const handleSubmit = async (values: any) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.accessToken}`,
+        },
+        body: JSON.stringify(values),
+      });
+      const json = await response.json();
+      if (response.ok) {
+        loadWebsites();
+        close();
+      } else {
+        alert(json.message);
+      }
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
 
   const websiteList = websites.map(website => (
     <Card key={website.id} w='100%' withBorder>
@@ -55,9 +81,6 @@ export default function Page() {
           </Text>
         }
       </Group>
-      <Text size="sm" c="dimmed">
-        Owner: {website.owner.name} ({website.owner.email})
-      </Text>
     </Card>
   ));
 
@@ -71,6 +94,37 @@ export default function Page() {
 
   return (
     <>
+      <Modal opened={opened} onClose={close} title="Add Website">
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <TextInput
+            required
+            type='url'
+            label="URL"
+            placeholder="https://example.com/"
+            key={form.key('url')}
+            {...form.getInputProps('url')}
+          />
+          <TextInput
+            required
+            label="Title"
+            placeholder="My Website"
+            key={form.key('title')}
+            {...form.getInputProps('title')}
+          />
+          <TextInput
+            label="Description"
+            placeholder="Website description"
+            key={form.key('description')}
+            {...form.getInputProps('description')}
+          />
+          <Group justify="center" mt="md">
+            <Button type="submit">Add</Button>
+          </Group>
+        </form>
+      </Modal>
+      <Group mt="md">
+        <Button leftSection={<IconPlus />} onClick={open}>Add Website</Button>
+      </Group>
       <Group mt="md">
         {websiteList}
       </Group>
