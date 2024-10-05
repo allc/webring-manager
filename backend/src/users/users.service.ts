@@ -25,12 +25,16 @@ export class UsersService {
     }
   }
 
-  findOne(email: string) {
-    return this.prisma.user.findUnique({ where: {email: email}})
+  findOne(id: number) {
+    return this.prisma.user.findUnique({ where: {id: id}})
+  }
+
+  findOneWithEmail(email: string) {
+    return this.prisma.user.findUnique({ where: {email: email}});
   }
 
   countAll() {
-    return this.prisma.user.count()
+    return this.prisma.user.count();
   }
 
   makeSuperuser(email: string) {

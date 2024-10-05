@@ -10,7 +10,7 @@ export class UsersController {
   @Get(':id/websites')
   findWebsites(@Request() req, @Param('id') userId: string) {
     const user = req.user;
-    if (user.sub !== +userId) {
+    if (user.id !== +userId) {
       throw new ForbiddenException();
     }
     return this.usersService.findWebsites(+userId);

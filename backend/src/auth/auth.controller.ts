@@ -21,7 +21,7 @@ export class AuthController {
     return this.authService.signup(body.email, body.name, body.password);
   }
 
-  @Get('user')
+  @Get('profile')
   @UseGuards(JwtAuthGuard)
   getUser(@Request() req) {
     return req.user;

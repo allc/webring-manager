@@ -19,7 +19,7 @@ export class WebsitesService {
           ordering: ordering,
           owner: {
             connect: {
-              id: user.sub,
+              id: user.id,
             }
           }
         }
