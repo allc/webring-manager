@@ -22,8 +22,13 @@ export class WebsitesController {
   @Get()
   @ApiOperation({ description: 'Websites sorted in order' })
   @ApiOkResponse({ type: WebsiteEntity, isArray: true })
-  findAll() {
-    return this.websitesService.findAll();
+  findAll(@Request() req) {
+    const user = req.user;
+    if (user && user.superuser) {
+      return this.websitesService.findAllIncludesWebsites();
+    } else {
+      return this.websitesService.findAllPublic();
+    }
   }
 
   // @Get(':id')

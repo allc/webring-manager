@@ -50,8 +50,36 @@ export class WebsitesService {
     return +(result[0]['ordering']);
   }
 
-  findAll() {
-    return this.prisma.website.findMany();
+  findAllPublic() {
+    return this.prisma.website.findMany({
+      select: {
+        id: true,
+        url: true,
+        title: true,
+        description: true,
+        addedAt: true,
+      },
+      orderBy: {
+        ordering: 'asc',
+      },
+    });
+  }
+
+  findAllIncludesWebsites() {
+    return this.prisma.website.findMany({
+      include: {
+        owner: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          }
+        }
+      },
+      orderBy: {
+        ordering: 'asc',
+      },
+    })
   }
 
   // findOne(id: number) {
