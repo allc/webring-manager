@@ -5,6 +5,7 @@ import '@mantine/core/styles.css';
 
 import { AppShell, ColorSchemeScript, Container, MantineProvider } from '@mantine/core';
 import NavBar from "@/components/NavBar";
+import UserProvider from "./UserProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -36,10 +37,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <MantineProvider>
-        <NavBar />
-          <Container>
-            {children}
-          </Container>
+          <UserProvider>
+            <NavBar />
+            <Container>
+              {children}
+            </Container>
+          </UserProvider>
         </MantineProvider>
       </body>
     </html>

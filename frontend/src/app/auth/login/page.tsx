@@ -1,11 +1,14 @@
 'use client';
 
+import { UserContext } from '@/app/UserProvider';
 import { Button, Checkbox, Group, PasswordInput, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
+import { useContext } from 'react';
 
 export default function Page() {
   const router = useRouter();
+  const [user, auth] = useContext(UserContext);
   const form = useForm({
     mode: 'uncontrolled',
   });
@@ -23,6 +26,7 @@ export default function Page() {
       if (response.ok) {
         alert('Logged in');
         localStorage.setItem('access_token', json.access_token);
+        auth();
         router.push('/');
       } else {
         alert(json.message);

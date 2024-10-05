@@ -6,36 +6,25 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../UserProvider';
 
 export default function Page() {
   const router = useRouter();
-  const access_token = localStorage.getItem('access_token');
-  const auth = async () => {
-    if (!access_token) {
-      router.push('/auth/login');
-    }
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/user`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${access_token}`,
-      }
-    });
-    if (!response.ok) {
-      localStorage.removeItem('access_token');
-      router.push('/auth/login');
-    }
-  }
-  auth();
-
+  const [user, setUser] = useContext(UserContext);
   const [websites, setWebsites] = useState<any[]>([]);
+  const [opened, { open, close }] = useDisclosure(false);
+  const form = useForm({
+    mode: 'uncontrolled',
+  });
+
   const loadWebsites = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users/15/websites`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${access_token}`,
+          'Authorization': `Bearer ${user.accessToken}`,
         },
       });
       const json = await response.json();
@@ -49,14 +38,13 @@ export default function Page() {
     }
   }
 
-  const [opened, { open, close }] = useDisclosure(false);
   const handleSubmit = async (values: any) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${access_token}`,
+          'Authorization': `Bearer ${user.accessToken}`,
         },
         body: JSON.stringify(values),
       });
@@ -72,17 +60,13 @@ export default function Page() {
     }
   };
 
-  const form = useForm({
-    mode: 'uncontrolled',
-  });
-
-  useEffect(() => {
-    loadWebsites();
-  }, []);
   const websiteList = websites.map(website => (
-    <Card w='100%' withBorder>
+    <Card key={website.id} w='100%' withBorder>
       <Text fw={500}>
         {website.title}
+      </Text>
+      <Text size="sm" c="dimmed">
+        {website.url}
       </Text>
       <Text size="sm" c="dimmed">
         {website.description}
@@ -97,6 +81,14 @@ export default function Page() {
       }
     </Card >
   ));
+
+  useEffect(() => {
+    if (user === false) {
+      router.push('/auth/login');
+    } else if (user) {
+      loadWebsites();
+    }
+  }, [user]);
 
   return (
     <>

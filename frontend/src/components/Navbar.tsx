@@ -3,6 +3,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { UnstyledButton } from '@mantine/core'
+import { useContext } from 'react'
+import { UserContext } from '@/app/UserProvider'
 
 const Title = () => (
   <Link href='/'>
@@ -30,9 +32,11 @@ const NavLink = ({
 const NavBar = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const [user, setUser] = useContext(UserContext);
 
   const logout = () => {
     localStorage.removeItem('access_token');
+    setUser(false);
     alert('Logged out');
     router.push('/')
   }
