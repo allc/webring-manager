@@ -20,7 +20,7 @@ export default function Page() {
 
   const loadWebsites = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users/${user.sub}/websites`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users/${user.id}/websites`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

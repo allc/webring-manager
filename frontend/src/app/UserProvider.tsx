@@ -16,7 +16,7 @@ export default function UserProvider({
       setUser(false);
       return;
     }
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/user`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/profile`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`,

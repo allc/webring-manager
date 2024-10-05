@@ -51,6 +51,7 @@ const NavBar = () => {
           {[
             { href: '/websites', label: 'Websites' },
             { href: '/my-websites', label: 'My Websites' },
+            { href: '/profile', label: 'Profile' },
             { href: '/auth/login', label: 'Login' },
             { href: '/auth/signup', label: 'Sign-up' },
           ].map((link) => (
