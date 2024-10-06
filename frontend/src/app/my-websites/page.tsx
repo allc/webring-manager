@@ -51,6 +51,7 @@ export default function Page() {
       const json = await response.json();
       if (response.ok) {
         loadWebsites();
+        form.reset();
         close();
       } else {
         alert(json.message);
