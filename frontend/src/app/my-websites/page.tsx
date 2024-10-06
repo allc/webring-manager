@@ -76,11 +76,9 @@ export default function Page() {
         <Text size="sm" c="dimmed">
           Added at: {website.addedAt}
         </Text >
-        {website.requestedAt &&
-          <Text size="sm" c="dimmed">
-            Last requested at: {website.requestedAt}
-          </Text>
-        }
+        <Text size="sm" c="dimmed">
+          Last API requested at: {website.requestedAt || 'Never'}
+        </Text>
       </Group>
     </Card>
   ));
