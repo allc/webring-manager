@@ -6,7 +6,7 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class WebsitesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(user, createWebsiteDto: CreateWebsiteDto) {
     //TODO: possibly make atomic?
@@ -65,7 +65,7 @@ export class WebsitesService {
     });
   }
 
-  findAllIncludesWebsites() {
+  findAllIncludesOwners() {
     return this.prisma.website.findMany({
       include: {
         owner: {
@@ -94,15 +94,108 @@ export class WebsitesService {
   //   return `This action removes a #${id} website`;
   // }
 
-  findPrev(currentUrl: string) {
-    return this.prisma.website.findUnique({ where: {url: currentUrl}})
+  async findOrderingWithUrl(currentUrl: string) {
+    const currentOrdering_ = await this.prisma.website.findMany({
+      select: {
+        ordering: true,
+      },
+      where: {
+        url: currentUrl,
+      },
+    });
+    if (currentOrdering_.length == 0) {
+      return null;
+    }
+    return currentOrdering_[0].ordering;
   }
 
-  findNext(currentUrl: string) {
-    return this.prisma.website.findUnique({ where: {url: currentUrl}})
+  async findNeighboursWithCurrentOrdering(currentOrdering: number) {
+    const result = {
+      prev: null,
+      next: null,
+    };
+
+    const totalCount = await this.prisma.website.count();
+
+    if (totalCount < 2) {
+      return result;
+    }
+
+    const index = await this.prisma.website.count({
+      where: {
+        ordering: {
+          lt: currentOrdering,
+        }
+      }
+    });
+
+    const prevSkip = index - 1 >= 0 ? index - 1 : totalCount - 1;
+    const prev = await this.prisma.website.findMany({
+      select: {
+        id: true,
+        url: true,
+        title: true,
+        description: true,
+        addedAt: true,
+      },
+      orderBy: {
+        ordering: 'asc',
+      },
+      skip: prevSkip,
+      take: 1,
+    });
+    // prev always exists (assuming atomic, though in reality there is a very little chance not)
+    result.prev = prev[0];
+
+    const nextSkip = index < totalCount - 1 ? index + 1 : 0;
+    const next = await this.prisma.website.findMany({
+      select: {
+        id: true,
+        url: true,
+        title: true,
+        description: true,
+        addedAt: true,
+      },
+      orderBy: {
+        ordering: 'asc',
+      },
+      skip: nextSkip,
+      take: 1,
+    });
+    // prev always exists (assuming atomic, though in reality there is a very little chance not)
+    result.next = next[0];
+
+    return result;
   }
 
-  findRandom(excludeUrl: string) {
-    return this.prisma.website.findFirst()
+  async findRandomExcludeUrl(excludeUrl: string) {
+    const count = await this.prisma.website.count({
+      where: {
+        url: {
+          not: excludeUrl ? excludeUrl : undefined,
+        },
+      },
+    });
+    const skip = Math.floor(Math.random() * count);
+    const websites = await this.prisma.website.findMany({
+      select: {
+        id: true,
+        url: true,
+        title: true,
+        description: true,
+        addedAt: true,
+      },
+      where: {
+        url: {
+          not: excludeUrl ? excludeUrl : undefined,
+        },
+      },
+      skip: skip,
+      take: 1,
+    });
+    if (websites.length == 0) {
+      return null;
+    }
+    return websites[0];
   }
 }

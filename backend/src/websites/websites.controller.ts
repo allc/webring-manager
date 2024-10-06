@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards, Request, NotFoundException, BadRequestException } from '@nestjs/common';
 import { WebsitesService } from './websites.service';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
@@ -10,7 +10,7 @@ import { JwtAnonymousAuthGuard } from 'src/auth/jwt-anonymous.guard';
 @Controller('websites')
 @ApiTags('websites')
 export class WebsitesController {
-  constructor(private readonly websitesService: WebsitesService) {}
+  constructor(private readonly websitesService: WebsitesService) { }
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -20,12 +20,10 @@ export class WebsitesController {
 
   @UseGuards(JwtAnonymousAuthGuard)
   @Get()
-  @ApiOperation({ description: 'Websites sorted in order' })
-  @ApiOkResponse({ type: WebsiteEntity, isArray: true })
   findAll(@Request() req) {
     const user = req.user;
     if (user && user.superuser) {
-      return this.websitesService.findAllIncludesWebsites();
+      return this.websitesService.findAllIncludesOwners();
     } else {
       return this.websitesService.findAllPublic();
     }
@@ -46,22 +44,22 @@ export class WebsitesController {
   //   return this.websitesService.remove(+id);
   // }
 
-  @Get('prev')
-  @ApiOkResponse({ type: WebsiteEntity })
-  findPrev(@Query('current') currentUrl: string) {
-    return this.websitesService.findPrev(currentUrl)
-  }
-
-  @Get('next')
-  @ApiOkResponse({ type: WebsiteEntity })
-  findNext(@Query('current') currentUrl: string) {
-    return this.websitesService.findNext(currentUrl)
+  @Get('neighbours')
+  async findNeighbours(@Query('currentUrl') currentUrl: string) {
+    const currentOrdering = await this.websitesService.findOrderingWithUrl(currentUrl);
+    if (!currentOrdering) {
+      throw new BadRequestException('Does not recognise current website');
+    }
+    return this.websitesService.findNeighboursWithCurrentOrdering(+currentOrdering);
   }
 
   @Get('random')
-  @ApiQuery({ name: 'exclude', required: false })
-  @ApiOkResponse({ type: WebsiteEntity })
-  findRandom(@Query('exclude') excludeUrl?: string) {
-    return this.websitesService.findRandom(excludeUrl)
+  @ApiQuery({ name: 'excludeUrl', required: false })
+  async findRandom(@Query('excludeUrl') excludeUrl?: string) {
+    const result = await this.websitesService.findRandomExcludeUrl(excludeUrl);
+    if (!result) {
+      throw new NotFoundException('No random website found');
+    }
+    return result;
   }
 }
