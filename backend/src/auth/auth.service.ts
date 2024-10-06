@@ -19,8 +19,8 @@ export class AuthService {
     return null;
   }
 
-  async validateUserId(id: number) {
-    const user = await this.userService.findOne(id);
+  async validateUserId(userId: number) {
+    const user = await this.userService.findOne(userId);
     if (user) {
       const { password, ...result } = user;
       return result;
@@ -53,5 +53,9 @@ export class AuthService {
   async hashPassword(pass: string) {
     const passwordHash = bcrypt.hash(pass, 10);
     return passwordHash
+  }
+
+  async updateActiveAt(userId: number) {
+    await this.userService.updateActiveAt(userId);
   }
 }

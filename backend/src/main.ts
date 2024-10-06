@@ -10,7 +10,6 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Webring Manager')
-    .setDescription('Public APIs only')
     .setVersion('0.1')
     .build();
 

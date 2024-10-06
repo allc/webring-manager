@@ -14,6 +14,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         if (!user) {
             throw new UnauthorizedException('Invalid email or password');
         }
+        await this.authService.updateActiveAt(user.id);
         return user;
     }
 }

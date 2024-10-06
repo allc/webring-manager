@@ -75,4 +75,15 @@ export class UsersService {
       }
     })
   }
+
+  updateActiveAt(id: number) {
+    return this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        activeAt: new Date(),
+      },
+    })
+  }
 }
