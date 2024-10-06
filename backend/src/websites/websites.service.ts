@@ -94,43 +94,80 @@ export class WebsitesService {
   //   return `This action removes a #${id} website`;
   // }
 
-  async findOrderingWithUrl(currentUrl: string) {
-    const currentOrdering_ = await this.prisma.website.findMany({
-      select: {
-        ordering: true,
-      },
-      where: {
-        url: currentUrl,
-      },
-    });
-    if (currentOrdering_.length == 0) {
-      return null;
-    }
-    return currentOrdering_[0].ordering;
-  }
-
-  async findNeighboursWithCurrentOrdering(currentOrdering: number) {
+  async findNeighboursWithCurrentUrl(currentUrl: string) {
     const result = {
       prev: null,
       next: null,
+      random: null,
     };
 
     const totalCount = await this.prisma.website.count();
 
-    if (totalCount < 2) {
-      return result;
+    let currentOrdering = undefined;
+    if (currentUrl) {
+      const currentOrdering_ = await this.prisma.website.findMany({
+        select: {
+          ordering: true,
+        },
+        where: {
+          url: currentUrl,
+        },
+      });
+      if (currentOrdering_.length > 0) {
+        // find prev and next
+        currentOrdering = currentOrdering_[0].ordering;
+      }
     }
 
-    const index = await this.prisma.website.count({
-      where: {
-        ordering: {
-          lt: currentOrdering,
+    if (totalCount > 1 && currentOrdering) {
+      const index = await this.prisma.website.count({
+        where: {
+          ordering: {
+            lt: currentOrdering,
+          }
         }
-      }
-    });
+      });
 
-    const prevSkip = index - 1 >= 0 ? index - 1 : totalCount - 1;
-    const prev = await this.prisma.website.findMany({
+      const prevSkip = index - 1 >= 0 ? index - 1 : totalCount - 1;
+      const prev = await this.prisma.website.findMany({
+        select: {
+          id: true,
+          url: true,
+          title: true,
+          description: true,
+          addedAt: true,
+        },
+        orderBy: {
+          ordering: 'asc',
+        },
+        skip: prevSkip,
+        take: 1,
+      });
+      // prev always exists (assuming atomic, though in reality there is a very little chance not)
+      result.prev = prev[0];
+
+      const nextSkip = index < totalCount - 1 ? index + 1 : 0;
+      const next = await this.prisma.website.findMany({
+        select: {
+          id: true,
+          url: true,
+          title: true,
+          description: true,
+          addedAt: true,
+        },
+        orderBy: {
+          ordering: 'asc',
+        },
+        skip: nextSkip,
+        take: 1,
+      });
+      // next always exists (assuming atomic, though in reality there is a very little chance not)
+      result.next = next[0];
+    }
+
+    // find random
+    const randomSkip = Math.floor(Math.random() * (totalCount - (currentOrdering === undefined? 0 : 1)));
+    const websites = await this.prisma.website.findMany({
       select: {
         id: true,
         url: true,
@@ -138,33 +175,18 @@ export class WebsitesService {
         description: true,
         addedAt: true,
       },
-      orderBy: {
-        ordering: 'asc',
+      where: {
+        url: {
+          not: currentUrl ? currentUrl : undefined,
+        },
       },
-      skip: prevSkip,
+      skip: randomSkip,
       take: 1,
     });
-    // prev always exists (assuming atomic, though in reality there is a very little chance not)
-    result.prev = prev[0];
-
-    const nextSkip = index < totalCount - 1 ? index + 1 : 0;
-    const next = await this.prisma.website.findMany({
-      select: {
-        id: true,
-        url: true,
-        title: true,
-        description: true,
-        addedAt: true,
-      },
-      orderBy: {
-        ordering: 'asc',
-      },
-      skip: nextSkip,
-      take: 1,
-    });
-    // prev always exists (assuming atomic, though in reality there is a very little chance not)
-    result.next = next[0];
-
+    if (websites.length > 0) {
+      result.random = websites[0];
+    }
+  
     return result;
   }
 

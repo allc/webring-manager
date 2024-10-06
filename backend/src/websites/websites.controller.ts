@@ -45,21 +45,8 @@ export class WebsitesController {
   // }
 
   @Get('neighbours')
-  async findNeighbours(@Query('currentUrl') currentUrl: string) {
-    const currentOrdering = await this.websitesService.findOrderingWithUrl(currentUrl);
-    if (!currentOrdering) {
-      throw new BadRequestException('Does not recognise current website');
-    }
-    return this.websitesService.findNeighboursWithCurrentOrdering(+currentOrdering);
-  }
-
-  @Get('random')
-  @ApiQuery({ name: 'excludeUrl', required: false })
-  async findRandom(@Query('excludeUrl') excludeUrl?: string) {
-    const result = await this.websitesService.findRandomExcludeUrl(excludeUrl);
-    if (!result) {
-      throw new NotFoundException('No random website found');
-    }
-    return result;
+  @ApiQuery({ name: 'currentUrl', required: false })
+  async findNeighbours(@Query('currentUrl') currentUrl?: string) {
+    return this.websitesService.findNeighboursWithCurrentUrl(currentUrl);
   }
 }
