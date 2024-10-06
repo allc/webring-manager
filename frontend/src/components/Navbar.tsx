@@ -49,6 +49,7 @@ const NavBar = () => {
         </div>
         <div className="flex space-x-8 px-2">
           {[
+            { href: '/users', label: 'Users' },
             { href: '/websites', label: 'Websites' },
             { href: '/my-websites', label: 'My Websites' },
             { href: '/profile', label: 'Profile' },

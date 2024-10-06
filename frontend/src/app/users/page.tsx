@@ -12,11 +12,11 @@ import { UserContext } from '../UserProvider';
 export default function Page() {
   const router = useRouter();
   const [user, setUser] = useContext(UserContext);
-  const [websites, setWebsites] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
 
-  const loadWebsites = async () => {
+  const loadUsers = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export default function Page() {
       });
       const json = await response.json();
       if (response.ok) {
-        setWebsites(json);
+        setUsers(json);
       } else {
         alert(json.message);
       }
@@ -34,30 +34,28 @@ export default function Page() {
     }
   }
 
-  const websiteList = websites.map(website => (
-    <Card key={website.id} w='100%' withBorder>
-      <Text fw={500}>
-        {website.title}
-      </Text>
-      <Text size="sm" c="dimmed">
-        {website.url}
-      </Text>
-      <Text size="sm">
-        {website.description}
-      </Text>
+  const userList = users.map(user => (
+    <Card key={user.id} w='100%' withBorder>
       <Group>
-        <Text size="sm" c="dimmed">
-          Added at: {website.addedAt}
-        </Text >
-        {website.requestedAt &&
-          <Text size="sm" c="dimmed">
-            Last requested at: {website.requestedAt}
-          </Text>
+        <Text fw={500}>
+          {user.name}
+        </Text>
+        {user.superuser &&
+          <Badge color="red">Superuser</Badge>
         }
       </Group>
       <Text size="sm" c="dimmed">
-        Owner: {website.owner.name} ({website.owner.email})
+        {user.email}
       </Text>
+      <Text size="sm" c="dimmed">
+        Number of websites: {user.website.length}
+      </Text>
+      <Text size="sm" c="dimmed">
+        Created at: {user.createdAt}
+      </Text>
+      <Text size="sm" c="dimmed">
+        Active at: {user.activeAt || 'Never'}
+      </Text >
     </Card>
   ));
 
@@ -68,14 +66,14 @@ export default function Page() {
       alert('No permission!');
       router.push('/');
     } else if (user) {
-      loadWebsites();
+      loadUsers();
     }
   }, [user]);
 
   return (
     <>
       <Group mt="md">
-        {websiteList}
+        {userList}
       </Group>
     </>
   )

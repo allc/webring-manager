@@ -21,24 +21,30 @@ export default function Page() {
       {user &&
         <form>
           <TextInput
-            disabled
+            readOnly
             label="Name"
             value={user.name}
           />
           <TextInput
-            disabled
+            readOnly
             label="Email"
             value={user.email}
           />
           <TextInput
-            disabled
+            readOnly
             label="Created at"
             value={user.createdAt}
           />
           <TextInput
-            disabled
+            readOnly
             label="Active at"
             value={user.activeAt || 'Never'}
+          />
+          <Checkbox
+            readOnly
+            label="Superuser"
+            checked={user.superuser}
+            mt='xs'
           />
         </form>
       }
