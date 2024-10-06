@@ -189,4 +189,15 @@ export class WebsitesService {
   
     return result;
   }
+
+  updateRequestedAtWithUrl(url: string) {
+    return this.prisma.website.update({
+      where: {
+        url: url,
+      },
+      data: {
+        requestedAt: new Date(),
+      },
+    });
+  }
 }

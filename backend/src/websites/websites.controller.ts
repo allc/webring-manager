@@ -47,6 +47,7 @@ export class WebsitesController {
   @Get('neighbours')
   @ApiQuery({ name: 'currentUrl', required: false })
   async findNeighbours(@Query('currentUrl') currentUrl?: string) {
+    await this.websitesService.updateRequestedAtWithUrl(currentUrl);
     return this.websitesService.findNeighboursWithCurrentUrl(currentUrl);
   }
 }
