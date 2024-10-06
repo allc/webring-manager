@@ -7,6 +7,17 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(JwtAuthGuard)
+  @Get()
+  findAll(@Request() req) {
+    const user = req.user;
+    if (user && user.superuser) {
+      return this.usersService.findAll();
+    } else {
+      throw new ForbiddenException();
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id/websites')
   findWebsites(@Request() req, @Param('id') userId: string) {
     const user = req.user;

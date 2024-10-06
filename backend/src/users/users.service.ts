@@ -25,6 +25,23 @@ export class UsersService {
     }
   }
 
+  findAll() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        superuser: true,
+        createdAt: true,
+        activeAt: true,
+        website: true,
+      },
+      orderBy: {
+        id: 'asc',
+      },
+    });
+  }
+
   findOne(id: number) {
     return this.prisma.user.findUnique({ where: {id: id}})
   }
