@@ -189,35 +189,4 @@ export class WebsitesService {
   
     return result;
   }
-
-  async findRandomExcludeUrl(excludeUrl: string) {
-    const count = await this.prisma.website.count({
-      where: {
-        url: {
-          not: excludeUrl ? excludeUrl : undefined,
-        },
-      },
-    });
-    const skip = Math.floor(Math.random() * count);
-    const websites = await this.prisma.website.findMany({
-      select: {
-        id: true,
-        url: true,
-        title: true,
-        description: true,
-        addedAt: true,
-      },
-      where: {
-        url: {
-          not: excludeUrl ? excludeUrl : undefined,
-        },
-      },
-      skip: skip,
-      take: 1,
-    });
-    if (websites.length == 0) {
-      return null;
-    }
-    return websites[0];
-  }
 }
