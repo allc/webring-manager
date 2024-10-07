@@ -6,6 +6,7 @@ import { ApiOkResponse, ApiOperation, ApiQuery, ApiSecurity, ApiTags } from '@ne
 import { WebsiteEntity } from './entities/website.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JwtAnonymousAuthGuard } from 'src/auth/jwt-anonymous.guard';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Controller('websites')
 @ApiTags('websites')
@@ -47,7 +48,13 @@ export class WebsitesController {
   @Get('neighbours')
   @ApiQuery({ name: 'currentUrl', required: false })
   async findNeighbours(@Query('currentUrl') currentUrl?: string) {
-    await this.websitesService.updateRequestedAtWithUrl(currentUrl);
+    try {
+      await this.websitesService.updateRequestedAtWithUrl(currentUrl);
+    } catch(e) {
+      if (e !instanceof PrismaClientKnownRequestError && e.code !== 'P2025') {
+        throw e;
+      }
+    }
     return this.websitesService.findNeighboursWithCurrentUrl(currentUrl);
   }
 }
