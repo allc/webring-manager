@@ -64,7 +64,6 @@ const NavBar = () => {
         { href: '/auth/signup', label: 'Sign-up' },
       ])
     }
-    console.log(navLinks);
     setNavLinks(navLinks);
   }, [user]);
 

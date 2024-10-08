@@ -1,7 +1,7 @@
 'use client';
 
 import { UserContext } from '@/app/UserProvider';
-import { Button, Checkbox, Group, PasswordInput, TextInput } from '@mantine/core';
+import { Button, Checkbox, Group, PasswordInput, TextInput, UnstyledButton } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
 import { useContext } from 'react';
@@ -55,6 +55,7 @@ export default function Page() {
       />
       <Group justify="center" mt="md">
         <Button type="submit">Login</Button>
+        <UnstyledButton c="dimmed" onClick={() => alert('Try remember better')}>Forgot password?</UnstyledButton>
       </Group>
     </form>
   )

@@ -8,13 +8,17 @@ import { UserContext } from '../UserProvider';
 
 export default function Page() {
   const router = useRouter();
-  const [user, setUser] = useContext(UserContext);
+  const [user, auth] = useContext(UserContext);
 
   useEffect(() => {
     if (user === false) {
       router.push('/auth/login');
     }
   }, [user]);
+
+  useEffect(() => {
+    auth();
+  }, []);
 
   return (
     <>
