@@ -82,17 +82,30 @@ export class WebsitesService {
     })
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} website`;
-  // }
+  findOne(id: number) {
+    return this.prisma.website.findUnique({
+      where: {
+        id: id,
+      },
+    });
+  }
 
-  // update(id: number, updateWebsiteDto: UpdateWebsiteDto) {
-  //   return `This action updates a #${id} website`;
-  // }
+  update(id: number, updateWebsiteDto: UpdateWebsiteDto) {
+    return this.prisma.website.update({
+      where: {
+        id: id,
+      },
+      data: updateWebsiteDto,
+    });
+  }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} website`;
-  // }
+  remove(id: number) {
+    return this.prisma.website.delete({
+      where: {
+        id: id
+      }
+    });
+  }
 
   async findNeighboursWithCurrentUrl(currentUrl: string) {
     const result = {

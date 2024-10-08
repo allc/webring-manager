@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, UseGuards, Request, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards, Request, NotFoundException, BadRequestException, Delete, Param, ForbiddenException, Patch } from '@nestjs/common';
 import { WebsitesService } from './websites.service';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
@@ -35,15 +35,31 @@ export class WebsitesController {
   //   return this.websitesService.findOne(+id);
   // }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateWebsiteDto: UpdateWebsiteDto) {
-  //   return this.websitesService.update(+id, updateWebsiteDto);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async update(@Request() req, @Param('id') id: string, @Body() updateWebsiteDto: UpdateWebsiteDto) {
+    const user = req.user;
+    if (!user.superuser) {
+      const website = await this.websitesService.findOne(+id);
+      if (website.ownerId !== user.id) {
+        throw new ForbiddenException('You do not have permission to edit this website');
+      }
+    }
+    return this.websitesService.update(+id, updateWebsiteDto);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.websitesService.remove(+id);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async remove(@Request() req, @Param('id') id: string) {
+    const user = req.user;
+    if (!user.superuser) {
+      const website = await this.websitesService.findOne(+id);
+      if (website.ownerId !== user.id) {
+        throw new ForbiddenException('You do not have permission to delete this website');
+      }
+    }
+    return this.websitesService.remove(+id);
+  }
 
   @Get('neighbours')
   @ApiQuery({ name: 'currentUrl', required: false })
