@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -48,6 +49,15 @@ export class UsersService {
 
   findOneWithEmail(email: string) {
     return this.prisma.user.findUnique({ where: {email: email}});
+  }
+
+  update(id: number, updateUserDto: UpdateUserDto) {
+    return this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: updateUserDto,
+    });
   }
 
   countAll() {

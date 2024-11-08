@@ -82,9 +82,11 @@ const NavBar = () => {
               isActive={pathname === link.href}
             />
           ))}
-          <UnstyledButton className={`hover:opacity-100 opacity-50`} onClick={logout}>
-            Logout
-          </UnstyledButton>
+          {user &&
+            <UnstyledButton className={`hover:opacity-100 opacity-50`} onClick={logout}>
+              Logout
+            </UnstyledButton>
+          }
         </div>
       </div>
     </nav>

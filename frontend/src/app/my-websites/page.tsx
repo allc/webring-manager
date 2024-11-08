@@ -181,10 +181,10 @@ export default function Page() {
     </Modal>
   )
 
-  const instructionJsCode = `<link rel="stylesheet" href="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.css">
+  const instructionJsCode = `<!-- TODO: add subsource integrity -->
+<link rel="stylesheet" href="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.css">
 <webring inject id="webring" api-server="${process.env.NEXT_PUBLIC_API_SERVER}" url="${currentInstructionWebsite.url}">
 </webring>
-<!-- TODO: add integrity -->
 <script src="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.js"></script>`;
   const instructionApiUrl_ = new URL(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites/neighbours`);
   instructionApiUrl_.search = new URLSearchParams({currentUrl: currentInstructionWebsite.url}).toString();
