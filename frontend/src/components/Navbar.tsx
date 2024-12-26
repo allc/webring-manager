@@ -1,9 +1,8 @@
 'use client'
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { UnstyledButton } from '@mantine/core'
-import { SetStateAction, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { UserContext } from '@/app/UserProvider'
 
 const Title = () => (
@@ -30,10 +29,16 @@ const NavLink = ({
 )
 
 const NavBar = () => {
+
+  interface NavLink {
+    href: string;
+    label: string;
+  }
+
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useContext(UserContext);
-  const [navLinks, setNavLinks] = useState<any[]>([]);
+  const [navLinks, setNavLinks] = useState<NavLink[]>([]);
 
   const logout = () => {
     localStorage.removeItem('access_token');
@@ -43,10 +48,7 @@ const NavBar = () => {
   }
 
   useEffect(() => {
-    const navLinks: {
-      href: string;
-      label: string;
-    }[] = [];
+    const navLinks: NavLink[] = [];
     if (user && user.superuser) {
       navLinks.push(...[
         { href: '/users', label: 'Users' },

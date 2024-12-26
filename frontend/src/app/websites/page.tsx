@@ -1,17 +1,13 @@
 'use client';
 
-import { Accordion, Badge, Button, Card, Checkbox, Group, Modal, Text, TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
-import { IconPlus } from '@tabler/icons-react';
-import Link from 'next/link';
+import { Card, Group, Text } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../UserProvider';
 
 export default function Page() {
   const router = useRouter();
-  const [user, setUser] = useContext(UserContext);
+  const [user] = useContext(UserContext);
   const [websites, setWebsites] = useState<any[]>([]);
 
   const loadWebsites = async () => {
