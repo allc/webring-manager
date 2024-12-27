@@ -4,31 +4,12 @@ import { Card, Group, Text } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../UserProvider';
+import { Website } from '@/types/Website';
 
 export default function Page() {
   const router = useRouter();
   const [user] = useContext(UserContext);
-  const [websites, setWebsites] = useState<any[]>([]);
-
-  const loadWebsites = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.accessToken}`,
-        },
-      });
-      const json = await response.json();
-      if (response.ok) {
-        setWebsites(json);
-      } else {
-        alert(json.message);
-      }
-    } catch (e: any) {
-      alert(e.message);
-    }
-  }
+  const [websites, setWebsites] = useState<Website[]>([]);
 
   const websiteList = websites.map(website => (
     <Card key={website.id} w='100%' withBorder>
@@ -56,6 +37,30 @@ export default function Page() {
   ));
 
   useEffect(() => {
+    const loadWebsites = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.accessToken}`,
+          },
+        });
+        const json = await response.json();
+        if (response.ok) {
+          setWebsites(json);
+        } else {
+          alert(json.message);
+        }
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          alert(e.message);
+        } else {
+          throw e;
+        }
+      }
+    }
+
     if (user === false) {
       router.push('/auth/login');
     } else if (user && !user.superuser) {
@@ -64,7 +69,7 @@ export default function Page() {
     } else if (user) {
       loadWebsites();
     }
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

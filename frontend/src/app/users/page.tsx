@@ -1,38 +1,25 @@
 'use client';
 
-import { Accordion, Badge, Button, Card, Checkbox, Group, Modal, Text, TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
-import { IconPlus } from '@tabler/icons-react';
-import Link from 'next/link';
+import { Badge, Card, Group, Text } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../UserProvider';
+import { Website } from '@/types/Website';
 
 export default function Page() {
-  const router = useRouter();
-  const [user, setUser] = useContext(UserContext);
-  const [users, setUsers] = useState<any[]>([]);
-
-  const loadUsers = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.accessToken}`,
-        },
-      });
-      const json = await response.json();
-      if (response.ok) {
-        setUsers(json);
-      } else {
-        alert(json.message);
-      }
-    } catch (e: any) {
-      alert(e.message);
-    }
+  interface User {
+    id: number;
+    name: string;
+    email: string;
+    superuser: boolean;
+    website: Website[];
+    createdAt: string;
+    activeAt: string;
   }
+
+  const router = useRouter();
+  const [user] = useContext(UserContext);
+  const [users, setUsers] = useState<User[]>([]);
 
   const userList = users.map(user => (
     <Card key={user.id} w='100%' withBorder>
@@ -60,6 +47,30 @@ export default function Page() {
   ));
 
   useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.accessToken}`,
+          },
+        });
+        const json = await response.json();
+        if (response.ok) {
+          setUsers(json);
+        } else {
+          alert(json.message);
+        }
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          alert(e.message);
+        } else {
+          throw e;
+        }
+      }
+    }
+
     if (user === false) {
       router.push('/auth/login');
     } else if (user && !user.superuser) {
@@ -68,7 +79,7 @@ export default function Page() {
     } else if (user) {
       loadUsers();
     }
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
