@@ -4,6 +4,7 @@ services:
       context: ./backend
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/webring
+      - SECRET_KEY=${SECRET}
       - NODE_ENV=production
     depends_on:
       - db
@@ -16,14 +17,12 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: webring
-    ports:
-      - 5432:5432
 
   frontend:
     build:
       context: ./frontend
       args:
-        - NEXT_PUBLIC_API_SERVER=http://localhost
+        - NEXT_PUBLIC_API_SERVER=${API_SERVER}
     ports:
       - 80:80
     environment:

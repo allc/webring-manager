@@ -1,0 +1,11 @@
+services:
+  db:
+    image: postgres:17.2
+    restart: always
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: webring
+    ports:
+      - 127.0.0.1:5432:5432
