@@ -1,20 +1,21 @@
 'use client';
 
-import { Accordion, ActionIcon, Badge, Button, Card, Checkbox, Code, CopyButton, Group, Modal, Stack, Tabs, Text, TextInput } from '@mantine/core';
+import { ActionIcon, Button, Card, Code, CopyButton, Group, Modal, Tabs, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { IconApi, IconBrandJavascript, IconBrandNextjs, IconBrandReact, IconCopy, IconEdit, IconEye, IconFileDescription, IconFileInfo, IconPlus, IconTool } from '@tabler/icons-react';
+import { IconApi, IconBrandJavascript, IconBrandReact, IconEdit, IconFileInfo, IconHtml, IconPlus } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { SetStateAction, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../UserProvider';
+import { Website } from '@/types/Website';
 
 export default function Page() {
   const router = useRouter();
-  const [user, auth] = useContext(UserContext);
-  const [websites, setWebsites] = useState<any[]>([]);
-  const [currentEditingWebsiteId, setCurrentEditingWebsiteId] = useState<any>();
-  const [currentInstructionWebsite, setCurrentInstructionWebsite] = useState<any>({});
+  const [user] = useContext(UserContext);
+  const [websites, setWebsites] = useState<Website[]>([]);
+  const [currentEditingWebsiteId, setCurrentEditingWebsiteId] = useState<number>();
+  const [currentInstructionWebsite, setCurrentInstructionWebsite] = useState<Website>();
   const [addWebsiteOpened, { open: openAddWebsite, close: closeAddWebsite }] = useDisclosure(false);
   const [editWebsiteOpened, { open: openEditWebsite, close: closeEditWebsite }] = useDisclosure(false);
   const [instructionOpened, { open: openInstruction, close: closeInstruction }] = useDisclosure(false);
@@ -27,11 +28,11 @@ export default function Page() {
 
   const loadWebsites = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users/${user.id}/websites`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users/${user ? user.id : 0}/websites`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.accessToken}`,
+          'Authorization': `Bearer ${user ? user.accessToken : ''}`,
         },
       });
       const json = await response.json();
@@ -40,18 +41,22 @@ export default function Page() {
       } else {
         alert(json.message);
       }
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        alert(e.message);
+      } else {
+        throw e;
+      }
     }
   }
 
-  const handleAdd = async (values: any) => {
+  const handleAdd = async (values: Record<string, string>) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.accessToken}`,
+          'Authorization': `Bearer ${user ? user.accessToken : ''}`,
         },
         body: JSON.stringify(values),
       });
@@ -63,8 +68,12 @@ export default function Page() {
       } else {
         alert(json.message);
       }
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        alert(e.message);
+      } else {
+        throw e;
+      }
     }
   };
 
@@ -99,7 +108,7 @@ export default function Page() {
     </Modal>
   )
 
-  const initialiseEditWebsiteForm = (website: any) => {
+  const initialiseEditWebsiteForm = (website: Website) => {
     setCurrentEditingWebsiteId(website.id);
     const initialFormData = { url: website.url, title: website.title, description: website.description };
     editWebsiteForm.setInitialValues(initialFormData);
@@ -107,13 +116,13 @@ export default function Page() {
     openEditWebsite();
   }
 
-  const handleEdit = async (values: any) => {
+  const handleEdit = async (values: Record<string, string>) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites/${currentEditingWebsiteId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.accessToken}`,
+          'Authorization': `Bearer ${user ? user.accessToken : ''}`,
         },
         body: JSON.stringify(values),
       });
@@ -125,8 +134,12 @@ export default function Page() {
       } else {
         alert(json.message);
       }
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        alert(e.message);
+      } else {
+        throw e;
+      }
     }
   };
 
@@ -136,7 +149,7 @@ export default function Page() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.accessToken}`,
+          'Authorization': `Bearer ${user ? user.accessToken : ''}`,
         },
       });
       const json = await response.json();
@@ -147,8 +160,12 @@ export default function Page() {
       } else {
         alert(json.message);
       }
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        alert(e.message);
+      } else {
+        throw e;
+      }
     }
   };
 
@@ -181,21 +198,35 @@ export default function Page() {
     </Modal>
   )
 
-  const instructionJsCode = `<!-- TODO: add subsource integrity -->
-<link rel="stylesheet" href="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.css">
-<webring inject id="webring" api-server="${process.env.NEXT_PUBLIC_API_SERVER}" url="${currentInstructionWebsite.url}">
-</webring>
-<script src="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.js"></script>`;
   const instructionApiUrl_ = new URL(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites/neighbours`);
-  instructionApiUrl_.search = new URLSearchParams({currentUrl: currentInstructionWebsite.url}).toString();
+  instructionApiUrl_.search = currentInstructionWebsite ? new URLSearchParams({currentUrl: currentInstructionWebsite.url}).toString() : new URLSearchParams({currentUrl: 'url'}).toString();
   const instructionApiUrl = instructionApiUrl_.toString();
 
+  const instructionHtmlCode = `<link rel="stylesheet" href="http://localhost:3000/api/webring.css">
+<webring>
+  <a href="http://localhost:8003" target="_blank">&lt;- Chiv's Website C</a>
+  <a href="http://localhost:8003" target="_blank">RANDOM</a>
+  <a href="http://localhost:8002" target="_blank">Chiv's Website B -&gt;</a>
+</webring>
+`;
+
+  const instructionJsCode = `<!-- TODO: add subsource integrity -->
+<link rel="stylesheet" href="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.css">
+<webring inject id="webring" api-server="${process.env.NEXT_PUBLIC_API_SERVER}" url="${currentInstructionWebsite ? currentInstructionWebsite.url : 'url'}">
+</webring>
+<script src="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.js"></script>`;
+
+  const instructionReactCode = `//TODO`;
+
   const instructionModal = (
-    <Modal size='xl' opened={instructionOpened} onClose={closeInstruction} title={`Add Webring to ${currentInstructionWebsite.title}`}>
+    <Modal size='xl' opened={instructionOpened} onClose={closeInstruction} title={`Add Webring to ${currentInstructionWebsite ? currentInstructionWebsite.title : ''}`}>
       <Tabs defaultValue="api">
         <Tabs.List>
           <Tabs.Tab value="api" leftSection={<IconApi />}>
             API
+          </Tabs.Tab>
+          <Tabs.Tab value="html" leftSection={<IconHtml />}>
+            HTML
           </Tabs.Tab>
           <Tabs.Tab value="js" leftSection={<IconBrandJavascript />}>
             Javascript
@@ -219,6 +250,20 @@ export default function Page() {
           <Code block mt='xs'>{instructionApiUrl}</Code>
         </Tabs.Panel>
 
+        <Tabs.Panel value="html">
+          <Group justify='space-between' mt='xs'>
+            <Text>HTML code example</Text>
+            <CopyButton value={instructionHtmlCode}>
+              {({ copied, copy }) => (
+                <Button variant='light' color={copied ? 'teal' : 'blue'} onClick={copy}>
+                  {copied ? 'Copied URL' : 'Copy code'}
+                </Button>
+              )}
+            </CopyButton>
+          </Group>
+          <Code block mt='xs'>{instructionHtmlCode}</Code>
+        </Tabs.Panel>
+
         <Tabs.Panel value="js">
           <Group justify='space-between' mt='xs'>
             <Text>HTML code example</Text>
@@ -235,7 +280,7 @@ export default function Page() {
         <Tabs.Panel value="react">
           <Group justify='space-between' mt='xs'>
             <Text>React code example</Text>
-            <CopyButton value='//TODO'>
+            <CopyButton value={instructionReactCode}>
               {({ copied, copy }) => (
                 <Button variant='light' color={copied ? 'teal' : 'blue'} onClick={copy}>
                   {copied ? 'Copied code' : 'Copy code'}
@@ -243,7 +288,7 @@ export default function Page() {
               )}
             </CopyButton>
           </Group>
-          <Code block mt='xs'>//TODO</Code>
+          <Code block mt='xs'>{instructionReactCode}</Code>
         </Tabs.Panel>
       </Tabs>
     </Modal>
@@ -287,7 +332,7 @@ export default function Page() {
     } else if (user) {
       loadWebsites();
     }
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

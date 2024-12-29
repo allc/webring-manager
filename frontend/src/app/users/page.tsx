@@ -53,7 +53,7 @@ export default function Page() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.accessToken}`,
+            'Authorization': `Bearer ${user ? user.accessToken : ''}`,
           },
         });
         const json = await response.json();

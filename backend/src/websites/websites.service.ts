@@ -111,7 +111,6 @@ export class WebsitesService {
     const result = {
       prev: null,
       next: null,
-      random: null,
     };
 
     const totalCount = await this.prisma.website.count();
@@ -176,28 +175,6 @@ export class WebsitesService {
       });
       // next always exists (assuming atomic, though in reality there is a very little chance not)
       result.next = next[0];
-    }
-
-    // find random
-    const randomSkip = Math.floor(Math.random() * (totalCount - (currentOrdering === undefined? 0 : 1)));
-    const websites = await this.prisma.website.findMany({
-      select: {
-        id: true,
-        url: true,
-        title: true,
-        description: true,
-        addedAt: true,
-      },
-      where: {
-        url: {
-          not: currentUrl ? currentUrl : undefined,
-        },
-      },
-      skip: randomSkip,
-      take: 1,
-    });
-    if (websites.length > 0) {
-      result.random = websites[0];
     }
   
     return result;

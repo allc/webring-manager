@@ -1,11 +1,12 @@
 'use client';
 
+import { Website } from "@/types/Website";
 import { Card, Group, Text } from "@mantine/core";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [websites, setWebsites] = useState<any[]>([]);
+  const [websites, setWebsites] = useState<Website[]>([]);
 
   const loadWebsites = async () => {
     try {
@@ -21,8 +22,12 @@ export default function Home() {
       } else {
         alert(json.message);
       }
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        alert(e.message);
+      } else {
+        throw e;
+      }
     }
   }
 

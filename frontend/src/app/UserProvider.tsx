@@ -1,15 +1,16 @@
 'use client'
 
+import { User } from '@/types/User';
 import { createContext, useEffect, useState } from 'react'
 
-export const UserContext = createContext<any>(false);
+export const UserContext = createContext<[User | undefined | false, () => Promise<void>]>([undefined, async () => {}]);
 
 export default function UserProvider({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const [user, setUser] = useState<any>(undefined);
+  const [user, setUser] = useState<User | undefined | false>(undefined);
   const auth = async () => {
     const accessToken = localStorage.getItem('access_token');
     if (!accessToken) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Checkbox, Group, PasswordInput, TextInput } from '@mantine/core';
+import { Button, Group, PasswordInput, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
 
@@ -10,7 +10,7 @@ export default function Page() {
     mode: 'uncontrolled',
   });
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Record<string, string>) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/signup`, {
         method: 'POST',
@@ -26,8 +26,12 @@ export default function Page() {
         const json = await response.json();
         alert(json.message);
       }
-    } catch(e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        alert(e.message);
+      } else {
+        throw e;
+      }
     }
   }
 

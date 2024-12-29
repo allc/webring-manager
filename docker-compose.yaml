@@ -4,8 +4,8 @@ services:
     # ports:
     #   - 3000:3000
     environment:
-      - NODE_ENV=production
       - DATABASE_URL=postgres://postgres:postgres@db:5432/webring
+      - NODE_ENV=production
     depends_on:
       - db
 
@@ -21,7 +21,11 @@ services:
       - 5432:5432
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        # idk why this does not work, set in Dockerfile if this does not work
+        - NEXT_PUBLIC_API_SERVER=http://localhost:3000
     ports:
       - 3000:3000
     environment:

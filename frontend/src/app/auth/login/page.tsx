@@ -1,19 +1,19 @@
 'use client';
 
 import { UserContext } from '@/app/UserProvider';
-import { Button, Checkbox, Group, PasswordInput, TextInput, UnstyledButton } from '@mantine/core';
+import { Button, Group, PasswordInput, TextInput, UnstyledButton } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
 import { useContext } from 'react';
 
 export default function Page() {
   const router = useRouter();
-  const [user, auth] = useContext(UserContext);
+  const [, auth] = useContext(UserContext);
   const form = useForm({
     mode: 'uncontrolled',
   });
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: Record<string, string>) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/login`, {
         method: 'POST',
@@ -31,8 +31,12 @@ export default function Page() {
       } else {
         alert(json.message);
       }
-    } catch(e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        alert(e.message);
+      } else {
+        throw e;
+      }
     }
   };
 

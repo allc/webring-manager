@@ -14,7 +14,7 @@ async function webringSetup() {
       webring.appendChild(prev);
 
       const random = document.createElement('a');
-      random.href = webringData.random.url;
+      // random.href = webringData.random.url;
       random.textContent = `RANDOM`;
       random.target = '_blank';
       webring.appendChild(random);
@@ -24,16 +24,12 @@ async function webringSetup() {
       next.textContent = `${webringData.next.title} ->`;
       next.target = '_blank';
       webring.appendChild(next);
-    } else if (webringData.random) {
+    } else {
       const random = document.createElement('a');
-      random.href = webringData.random.url;
+      // random.href = webringData.random.url;
       random.textContent = `Random Webring Neighbour`;
       random.target = '_blank';
       webring.appendChild(random);
-    } else {
-      const message = document.createElement('div');
-      message.textContent = 'Cannot find neighbours in the webring'
-      webring.appendChild(message);
     }
   }
 }

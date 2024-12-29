@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import '@mantine/core/styles.css';
 
-import { AppShell, ColorSchemeScript, Container, MantineProvider } from '@mantine/core';
+import { ColorSchemeScript, Container, MantineProvider } from '@mantine/core';
 import NavBar from "@/components/Navbar";
 import UserProvider from "./UserProvider";
 

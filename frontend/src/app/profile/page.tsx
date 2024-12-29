@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Checkbox, Group, PasswordInput, TextInput } from '@mantine/core';
+import { Button, Checkbox, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect } from 'react';
@@ -12,17 +12,17 @@ export default function Page() {
   const updateForm = useForm({
     mode: 'uncontrolled',
   });
-  const changePasswordForm = useForm({
-    mode: 'uncontrolled',
-  });
+  // const changePasswordForm = useForm({
+  //   mode: 'uncontrolled',
+  // });
 
-  const handleUpdate = async (values: any) => {
+  const handleUpdate = async (values: Record<string, string>) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users/${user.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/users/${user ? user.id : 0}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.accessToken}`,
+          'Authorization': `Bearer ${user ? user.accessToken : ''}`,
         },
         body: JSON.stringify(values),
       });
@@ -32,25 +32,29 @@ export default function Page() {
       } else {
         alert(json.message);
       }
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        alert(e.message);
+      } else {
+        throw e;
+      }
     }
   };
 
-  const handleUpdatePassword = async (values: any) => {
-    //TODO: implement
-    console.log(values);
-  };
+  // const handleUpdatePassword = async (values: any) => {
+  //   //TODO: implement
+  //   console.log(values);
+  // };
 
   useEffect(() => {
     if (user === false) {
       router.push('/auth/login');
     }
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     auth();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (user) {
@@ -58,7 +62,7 @@ export default function Page() {
       updateForm.setInitialValues(initialValues);
       updateForm.setValues(initialValues);
     }
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

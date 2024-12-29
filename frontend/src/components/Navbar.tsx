@@ -37,12 +37,12 @@ const NavBar = () => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useContext(UserContext);
+  const [user, auth] = useContext(UserContext);
   const [navLinks, setNavLinks] = useState<NavLink[]>([]);
 
   const logout = () => {
     localStorage.removeItem('access_token');
-    setUser(false);
+    auth();
     alert('Logged out');
     router.push('/')
   }

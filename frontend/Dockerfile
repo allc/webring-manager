@@ -12,10 +12,12 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
+ENV NEXT_PUBLIC_API_SERVER=http://localhost:3000
+
 RUN npm run build
 
 # Expose the application port
 EXPOSE 3000
 
 # Command to run the application
-CMD ["npm", "run", "start"]
+CMD ["npx", "serve@latest", "out"]
