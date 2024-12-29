@@ -1,7 +1,7 @@
-FROM node:23
+FROM node:23 as build
 
 # Set the working directory inside the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
@@ -12,12 +12,14 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
-ENV NEXT_PUBLIC_API_SERVER=http://localhost:3000
+ARG NEXT_PUBLIC_API_SERVER
+ENV NEXT_PUBLIC_API_SERVER=$NEXT_PUBLIC_API_SERVER
 
 RUN npm run build
 
-# Expose the application port
-EXPOSE 3000
+FROM nginx:1.27.3-alpine
 
-# Command to run the application
-CMD ["npx", "serve@latest", "out"]
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=build /app/out /usr/share/nginx/html
+
+EXPOSE 80
