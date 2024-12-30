@@ -71,6 +71,14 @@ export default function Page() {
     }
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  if (websites.length === 0) {
+    return (
+      <Text ta="center">
+        No websites.
+      </Text>
+    );
+  }
+
   return (
     <>
       <Group mt="md">
