@@ -22,3 +22,6 @@
 
 - Email verification
 - Password reset
+- Instruction for React integration
+- Add subsource integrity to instruction example codes
+- Monitoring and notification
