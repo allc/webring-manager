@@ -30,9 +30,10 @@ model Website {
   title String
   description String?
   ordering  Decimal @unique
-  addedAt  DateTime?
-  requestedAt  DateTime @default(now())
   approved Boolean @default(false)
+  requestAddAt DateTime @default(now())
+  addedAt  DateTime?
+  requestedAt  DateTime?
   owner  User  @relation(fields: [ownerId], references: [id])
   ownerId Int
 }
