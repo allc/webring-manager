@@ -22,10 +22,10 @@ export class WebsitesController {
 
   @UseGuards(JwtAnonymousAuthGuard)
   @Get()
-  findAll(@Request() req) {
+  findAll(@Request() req: {user: UserEntity}) {
     const user = req.user;
     if (user && user.superuser) {
-      return this.websitesService.findAllIncludesOwners();
+      return this.websitesService.findAll();
     } else {
       return this.websitesService.findAllPublic();
     }

@@ -2,6 +2,7 @@ import { Controller, Get, Param, UseGuards, Request, ForbiddenException, Patch, 
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from '@prisma/client';
 
 @Controller('users')
 export class UsersController {
@@ -20,7 +21,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id/websites')
-  findWebsites(@Request() req, @Param('id') userId: string) {
+  findWebsites(@Request() req: {user: User}, @Param('id') userId: string) {
     const user = req.user;
     if (user.id !== +userId) {
       throw new ForbiddenException();

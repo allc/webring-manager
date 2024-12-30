@@ -60,6 +60,14 @@ export class WebsitesService {
         title: true,
         description: true,
         addedAt: true,
+        owner: {
+          select: {
+            name: true,
+          }
+        }
+      },
+      where: {
+        approved: true,
       },
       orderBy: {
         ordering: 'asc',
@@ -67,7 +75,7 @@ export class WebsitesService {
     });
   }
 
-  findAllIncludesOwners() {
+  findAll() {
     return this.prisma.website.findMany({
       include: {
         owner: {
