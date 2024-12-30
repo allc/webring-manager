@@ -42,8 +42,21 @@ export default function Page() {
   };
 
   const handleUpdatePassword = async (values: Record<string, string>) => {
-    //TODO: implement
-    console.log(values);
+    if (values.newPassword !== values.confirmNewPassword) {
+      alert('New passwords do not match');
+      return;
+    }
+    fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user ? user.accessToken : ''}`,
+      },
+      body: JSON.stringify({
+        oldPassword: values.oldPassword,
+        newPassword: values.newPassword,
+      }),
+    });
   };
 
   useEffect(() => {

@@ -2,6 +2,9 @@ import { Body, Controller, Get, HttpCode, Post, Request, UseGuards } from '@nest
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -23,7 +26,15 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  getUser(@Request() req) {
+  @ApiBearerAuth()
+  getUser(@Request() req: {user: UserEntity}) {
     return req.user;
+  }
+
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  changePassword(@Request() req: {user: UserEntity}, @Body() body: ChangePasswordDto) {
+    // return this.authService.changePassword(req.user, body.oldPassword, body.newPassword);
   }
 }
