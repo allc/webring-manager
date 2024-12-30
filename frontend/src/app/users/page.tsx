@@ -34,15 +34,22 @@ export default function Page() {
       <Text size="sm" c="dimmed">
         {user.email}
       </Text>
-      <Text size="sm" c="dimmed">
-        Number of websites: {user.website.length}
-      </Text>
-      <Text size="sm" c="dimmed">
-        Created at: {user.createdAt}
-      </Text>
-      <Text size="sm" c="dimmed">
-        Active at: {user.activeAt || 'Never'}
-      </Text >
+      <Group>
+        <Text size="sm" c="dimmed">
+          Number of websites in the ring: {user.website.filter(website => website.approved).length}
+        </Text>
+        <Text size="sm" c="dimmed">
+          Number of websites pending approval: {user.website.filter(website => !website.approved).length}
+        </Text>
+      </Group>
+      <Group>
+        <Text size="sm" c="dimmed">
+          Created at: {user.createdAt}
+        </Text>
+        <Text size="sm" c="dimmed">
+          Active at: {user.activeAt || 'Never'}
+        </Text >
+      </Group>
     </Card>
   ));
 

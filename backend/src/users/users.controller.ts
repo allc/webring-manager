@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '@prisma/client';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
@@ -10,7 +11,8 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(@Request() req) {
+  @ApiBearerAuth()
+  findAll(@Request() req: {user: User}) {
     const user = req.user;
     if (user && user.superuser) {
       return this.usersService.findAll();
@@ -21,6 +23,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id/websites')
+  @ApiBearerAuth()
   findWebsites(@Request() req: {user: User}, @Param('id') userId: string) {
     const user = req.user;
     if (user.id !== +userId) {
