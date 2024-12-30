@@ -101,6 +101,9 @@ export default function Page() {
           key={addWebsiteForm.key('description')}
           {...addWebsiteForm.getInputProps('description')}
         />
+        <Text size="sm" c="dimmed">
+          Your website will be pending approval before being added to the webring.
+        </Text>
         <Group justify="center" mt="md">
           <Button variant='light' type="submit">Add</Button>
         </Group>

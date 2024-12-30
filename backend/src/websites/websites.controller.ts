@@ -2,11 +2,11 @@ import { Controller, Get, Post, Body, Query, UseGuards, Request, NotFoundExcepti
 import { WebsitesService } from './websites.service';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
-import { ApiOkResponse, ApiOperation, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { WebsiteEntity } from './entities/website.entity';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JwtAnonymousAuthGuard } from 'src/auth/jwt-anonymous.guard';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Controller('websites')
 @ApiTags('websites')
@@ -15,7 +15,8 @@ export class WebsitesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Request() req, @Body() createWebsiteDto: CreateWebsiteDto) {
+  @ApiBearerAuth()
+  create(@Request() req: {user: UserEntity}, @Body() createWebsiteDto: CreateWebsiteDto) {
     return this.websitesService.create(req.user, createWebsiteDto);
   }
 

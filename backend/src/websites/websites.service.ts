@@ -3,12 +3,13 @@ import { CreateWebsiteDto } from './dto/create-website.dto';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class WebsitesService {
   constructor(private prisma: PrismaService) { }
 
-  async create(user, createWebsiteDto: CreateWebsiteDto) {
+  async create(user: UserEntity, createWebsiteDto: CreateWebsiteDto) {
     //TODO: possibly make atomic?
     const lastOrdering = await this.findLastOrdering();
     const ordering = Math.ceil(lastOrdering) + 1;
@@ -17,6 +18,7 @@ export class WebsitesService {
         data: {
           ...createWebsiteDto,
           ordering: ordering,
+          approved: false,
           owner: {
             connect: {
               id: user.id,
