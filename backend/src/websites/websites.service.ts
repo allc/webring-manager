@@ -117,6 +117,20 @@ export class WebsitesService {
     });
   }
 
+  async approve(id: number) {
+    const ordering = await this.findLastOrdering() + 1;
+    return this.prisma.website.update({
+      where: {
+        id: id,
+      },
+      data: {
+        ordering: ordering,
+        approved: true,
+        addedAt: new Date(),
+      },
+    });
+  }
+
   async findNeighboursWithCurrentUrl(currentUrl: string) {
     const result = {
       prev: null,

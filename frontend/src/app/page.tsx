@@ -32,9 +32,12 @@ export default function Home() {
   }
 
   const websiteList = websites.map(website => (
-    <Card key={website.id} w='100%' withBorder component={Link} href={website.url} target="_blank">
-      <Text fw={500}>
+    <Card key={website.id} w='100%' withBorder>
+      <Text fw={500} component={Link} href={website.url} target="_blank">
         {website.title}
+      </Text>
+      <Text size="sm" c="dimmed">
+        {website.url}
       </Text>
       <Text size="sm">
         {website.description}

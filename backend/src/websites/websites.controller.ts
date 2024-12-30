@@ -62,6 +62,17 @@ export class WebsitesController {
     return this.websitesService.remove(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/approve')
+  @ApiBearerAuth()
+  approve(@Request() req: {user: UserEntity}, @Param('id') id: string) {
+    const user = req.user;
+    if (!user.superuser) {
+      throw new ForbiddenException('You do not have permission to approve websites.');
+    }
+    return this.websitesService.approve(+id);
+  }
+
   @Get('neighbours')
   @ApiQuery({ name: 'currentUrl', required: false })
   async findNeighbours(@Query('currentUrl') currentUrl?: string) {
