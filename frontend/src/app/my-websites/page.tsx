@@ -222,13 +222,15 @@ export default function Page() {
 <webring>
   <a href="${currentInstructionNeighbours.prev ? currentInstructionNeighbours.prev.url : 'url-for-previous-neighbour'}" target="_blank">&lt;- ${currentInstructionNeighbours.prev? currentInstructionNeighbours.prev.title : 'Title for Previous Neighbour'}</a>
   <a href="${instructionRandomUrl}" target="_blank">RANDOM</a>
-  <a href="${currentInstructionNeighbours.next ? currentInstructionNeighbours.next.url : 'url-for-next-neighbour'}" target="_blank">&lt;- ${currentInstructionNeighbours.next? currentInstructionNeighbours.next.title : 'Title for Next Neighbour'}</a>
+  <a href="${currentInstructionNeighbours.next ? currentInstructionNeighbours.next.url : 'url-for-next-neighbour'}" target="_blank">${currentInstructionNeighbours.next? currentInstructionNeighbours.next.title : 'Title for Next Neighbour'} -&gt;</a>
 </webring>
 `;
 
-  const instructionJsCode = `<!-- TODO: add subsource integrity -->
-<link rel="stylesheet" href="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.css">
+  const instructionJsCode = `<link rel="stylesheet" href="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.css">
 <webring inject id="webring" api-server="${process.env.NEXT_PUBLIC_API_SERVER}" url="${currentInstructionWebsite ? currentInstructionWebsite.url : 'url'}">
+  <a href="${currentInstructionNeighbours.prev ? currentInstructionNeighbours.prev.url : 'url-for-previous-neighbour'}" target="_blank">&lt;- ${currentInstructionNeighbours.prev? currentInstructionNeighbours.prev.title : 'Title for Previous Neighbour'}</a>
+  <a href="${instructionRandomUrl}" target="_blank">RANDOM</a>
+  <a href="${currentInstructionNeighbours.next ? currentInstructionNeighbours.next.url : 'url-for-next-neighbour'}" target="_blank">${currentInstructionNeighbours.next? currentInstructionNeighbours.next.title : 'Title for Next Neighbour'} -&gt;</a>
 </webring>
 <script src="${process.env.NEXT_PUBLIC_API_SERVER}/api/webring.js"></script>`;
 
