@@ -42,6 +42,9 @@ export default function Home() {
       <Text size="sm">
         {website.description}
       </Text>
+      <Text size="sm" c="dimmed">
+        Owner: {website.owner.name}
+      </Text>
     </Card>
   ));
 
