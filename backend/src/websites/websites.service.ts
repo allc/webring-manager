@@ -132,6 +132,7 @@ export class WebsitesService {
   }
 
   async findNeighboursWithCurrentUrl(currentUrl: string) {
+    // find current url ordering
     let currentOrdering = undefined;
     try {
       const currentOrdering_ = await this.prisma.website.findUniqueOrThrow({
@@ -161,21 +162,11 @@ export class WebsitesService {
         approved: true,
       },
     });
-
+    // if there are less than 2 websites, there are no neighbours
     if (totalCount < 2) {
       return result;
     }
 
-    const index = await this.prisma.website.count({
-      where: {
-        ordering: {
-          lt: currentOrdering,
-        },
-        approved: true,
-      }
-    });
-
-    const prevSkip = index - 1 >= 0 ? index - 1 : totalCount - 1;
     const prev = await this.prisma.website.findMany({
       select: {
         id: true,
@@ -190,18 +181,16 @@ export class WebsitesService {
         },
       },
       where: {
+        ordering: {
+          lt: currentOrdering,
+        },
         approved: true,
       },
       orderBy: {
-        ordering: 'asc',
+        ordering: 'desc',
       },
-      skip: prevSkip,
-      take: 1,
     });
-    // prev always exists (assuming atomic, though in reality there is a very little chance not)
-    result.prev = prev[0];
 
-    const nextSkip = index < totalCount - 1 ? index + 1 : 0;
     const next = await this.prisma.website.findMany({
       select: {
         id: true,
@@ -216,16 +205,27 @@ export class WebsitesService {
         },
       },
       where: {
+        ordering: {
+          gt: currentOrdering,
+        },
         approved: true,
       },
       orderBy: {
         ordering: 'asc',
       },
-      skip: nextSkip,
-      take: 1,
     });
-    // next always exists (assuming atomic, though in reality there is a very little chance not)
-    result.next = next[0];
+    
+    if (prev.length > 0) {
+      result.prev = prev[0];
+    } else {
+      result.prev = next[next.length - 1];
+    }
+
+    if (next.length > 0) {
+      result.next = next[0];
+    } else {
+      result.next = prev[prev.length - 1];
+    }
 
     return result;
   }
