@@ -11,7 +11,7 @@ export default function Page() {
   const [user] = useContext(UserContext);
   const [websites, setWebsites] = useState<Website[]>([]);
 
-  const websiteList = websites.map(website => (
+  const websiteList = websites.filter(website => website.approved).map(website => (
     <Card key={website.id} w='100%' withBorder>
       <Text fw={500}>
         {website.title}
@@ -25,9 +25,31 @@ export default function Page() {
       <Group>
         <Text size="sm" c="dimmed">
           Added at: {website.addedAt}
-        </Text >
+        </Text>
         <Text size="sm" c="dimmed">
           Last API requested at: {website.requestedAt || 'Never'}
+        </Text>
+      </Group>
+      <Text size="sm" c="dimmed">
+        Owner: {website.owner.name} ({website.owner.email})
+      </Text>
+    </Card>
+  ));
+
+  const pendingWebsiteList = websites.filter(website => !website.approved).map(website => (
+    <Card key={website.id} w='100%' withBorder>
+      <Text fw={500}>
+        {website.title}
+      </Text>
+      <Text size="sm" c="dimmed">
+        {website.url}
+      </Text>
+      <Text size="sm">
+        {website.description}
+      </Text>
+      <Group>
+        <Text size="sm" c="dimmed">
+          Requested adding at: {website.requestAddAt}
         </Text>
       </Group>
       <Text size="sm" c="dimmed">
@@ -71,19 +93,25 @@ export default function Page() {
     }
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (websites.length === 0) {
-    return (
-      <Text ta="center">
-        No websites.
-      </Text>
-    );
-  }
-
   return (
     <>
-      <Group mt="md">
-        {websiteList}
-      </Group>
+      {websiteList.length === 0 ? (
+        <Text ta="center" mt="md">
+          No websites.
+        </Text>
+      ) : (
+        <Group mt="md">
+          {websiteList}
+        </Group >
+      )}
+      {pendingWebsiteList.length > 0 && (
+        <>
+          <Text size="xl" mt="lg">Pending Approval</Text>
+          <Group mt="md">
+            {pendingWebsiteList}
+          </Group>
+        </>
+      )}
     </>
   )
 }

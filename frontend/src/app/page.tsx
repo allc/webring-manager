@@ -48,7 +48,7 @@ export default function Home() {
 
   if (websites.length === 0) {
     return (
-      <Text ta="center">
+      <Text ta="center" mt="md">
         No websites.
       </Text>
     );
