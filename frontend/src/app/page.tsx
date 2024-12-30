@@ -46,6 +46,14 @@ export default function Home() {
       loadWebsites();
   }, []);
 
+  if (websites.length === 0) {
+    return (
+      <Text ta="center">
+        No websites.
+      </Text>
+    );
+  }
+
   return (
     <>
       <Group mt="md">
