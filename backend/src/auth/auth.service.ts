@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -57,5 +58,17 @@ export class AuthService {
 
   async updateActiveAt(userId: number) {
     await this.userService.updateActiveAt(userId);
+  }
+
+  async changePassword(user: UserEntity, oldPassword: string, newPassword: string) {
+    const userFromDb = await this.userService.findOne(user.id);
+    if (!bcrypt.compareSync(oldPassword, userFromDb.password)) {
+      throw new ForbiddenException('Old password is incorrect');
+    }
+    const passwordHash = await this.hashPassword(newPassword);
+    await this.userService.updatePassword(user.id, passwordHash);
+    return {
+      message: 'Password changed',
+    };
   }
 }

@@ -46,17 +46,28 @@ export default function Page() {
       alert('New passwords do not match');
       return;
     }
-    fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/change-password`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${user ? user.accessToken : ''}`,
-      },
-      body: JSON.stringify({
-        oldPassword: values.oldPassword,
-        newPassword: values.newPassword,
-      }),
-    });
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/auth/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user ? user.accessToken : ''}`,
+        },
+        body: JSON.stringify({
+          oldPassword: values.oldPassword,
+          newPassword: values.newPassword,
+        }),
+      });
+      const json = await response.json();
+      alert(json.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        alert(e.message);
+      } else {
+        throw e;
+      }
+    }
+    changePasswordForm.reset();
   };
 
   useEffect(() => {
