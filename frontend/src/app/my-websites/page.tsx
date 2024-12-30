@@ -147,6 +147,10 @@ export default function Page() {
   };
 
   const handleDelete = async () => {
+    const confirm = window.confirm("Do you want to delete?");
+    if (!confirm) {
+      return;
+    }
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites/${currentEditingWebsiteId}`, {
         method: 'DELETE',
