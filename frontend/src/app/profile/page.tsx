@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Checkbox, TextInput } from '@mantine/core';
+import { Button, Checkbox, PasswordInput, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect } from 'react';
@@ -12,9 +12,9 @@ export default function Page() {
   const updateForm = useForm({
     mode: 'uncontrolled',
   });
-  // const changePasswordForm = useForm({
-  //   mode: 'uncontrolled',
-  // });
+  const changePasswordForm = useForm({
+    mode: 'uncontrolled',
+  });
 
   const handleUpdate = async (values: Record<string, string>) => {
     try {
@@ -41,10 +41,10 @@ export default function Page() {
     }
   };
 
-  // const handleUpdatePassword = async (values: any) => {
-  //   //TODO: implement
-  //   console.log(values);
-  // };
+  const handleUpdatePassword = async (values: Record<string, string>) => {
+    //TODO: implement
+    console.log(values);
+  };
 
   useEffect(() => {
     if (user === false) {
@@ -83,7 +83,7 @@ export default function Page() {
             />
             <Button type='submit' mt='xs'>Update</Button>
           </form>
-          {/* <form onSubmit={changePasswordForm.onSubmit(handleUpdatePassword)}>
+          <form onSubmit={changePasswordForm.onSubmit(handleUpdatePassword)}>
             <PasswordInput
               required
               label="Old Password"
@@ -96,8 +96,14 @@ export default function Page() {
               key={changePasswordForm.key('newPassword')}
               {...changePasswordForm.getInputProps('newPassword')}
             />
+            <PasswordInput
+              required
+              label="Confirm New Password"
+              key={changePasswordForm.key('confirmNewPassword')}
+              {...changePasswordForm.getInputProps('confirmNewPassword')}
+            />
             <Button type='submit' mt='xs'>Change Password</Button>
-          </form> */}
+          </form>
           <form>
             <TextInput
               readOnly

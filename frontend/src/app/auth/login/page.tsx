@@ -24,10 +24,9 @@ export default function Page() {
       });
       const json = await response.json();
       if (response.ok) {
-        alert('Logged in');
         localStorage.setItem('access_token', json.access_token);
         auth();
-        router.push('/');
+        router.push('/profile/');
       } else {
         alert(json.message);
       }

@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { UnstyledButton } from '@mantine/core'
 import { useContext, useEffect, useState } from 'react'
 import { UserContext } from '@/app/UserProvider'
@@ -35,7 +35,6 @@ const NavBar = () => {
     label: string;
   }
 
-  const router = useRouter();
   const pathname = usePathname();
   const [user, auth] = useContext(UserContext);
   const [navLinks, setNavLinks] = useState<NavLink[]>([]);
@@ -43,8 +42,6 @@ const NavBar = () => {
   const logout = () => {
     localStorage.removeItem('access_token');
     auth();
-    alert('Logged out');
-    router.push('/')
   }
 
   useEffect(() => {
@@ -57,7 +54,7 @@ const NavBar = () => {
     } if (user) {
       navLinks.push(...[
         { href: '/my-websites', label: 'My Websites' },
-        { href: '/profile', label: 'Profile' },
+        { href: '/profile', label: user.name },
       ]);
     }
     if (!user) {
