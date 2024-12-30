@@ -17,3 +17,8 @@
 ### Run frontend
 1. Go to `frontend` folder
 2. Run `npm run dev`
+
+## TODO
+
+- Email verification
+- Password reset
