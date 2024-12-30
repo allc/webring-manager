@@ -16,6 +16,7 @@ export default function Page() {
   const [websites, setWebsites] = useState<Website[]>([]);
   const [currentEditingWebsiteId, setCurrentEditingWebsiteId] = useState<number>();
   const [currentInstructionWebsite, setCurrentInstructionWebsite] = useState<Website>();
+  const [currentInstructionNeighbours, setCurrentInstructionNeighbours] = useState<{prev: Website | undefined | null, next: Website | undefined | null}>({prev: undefined, next: undefined});
   const [addWebsiteOpened, { open: openAddWebsite, close: closeAddWebsite }] = useDisclosure(false);
   const [editWebsiteOpened, { open: openEditWebsite, close: closeEditWebsite }] = useDisclosure(false);
   const [instructionOpened, { open: openInstruction, close: closeInstruction }] = useDisclosure(false);
@@ -205,15 +206,23 @@ export default function Page() {
     </Modal>
   )
 
-  const instructionApiUrl_ = new URL(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites/neighbours`);
-  instructionApiUrl_.search = currentInstructionWebsite ? new URLSearchParams({current: currentInstructionWebsite.url}).toString() : new URLSearchParams({current: 'url'}).toString();
-  const instructionApiUrl = instructionApiUrl_.toString();
+  const instructionNeighboursApiUrl_ = new URL(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites/neighbours`);
+  if (currentInstructionWebsite) {
+    instructionNeighboursApiUrl_.search = new URLSearchParams({current: currentInstructionWebsite.url}).toString();
+  }
+  const instructionNeighboursApiUrl = instructionNeighboursApiUrl_.toString();
+
+  const instructionRandomUrl_ = new URL(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites/random`);
+  if (currentInstructionWebsite) {
+    instructionRandomUrl_.search = new URLSearchParams({current: currentInstructionWebsite.url}).toString();
+  }
+  const instructionRandomUrl = instructionRandomUrl_.toString();
 
   const instructionHtmlCode = `<link rel="stylesheet" href="http://localhost:3000/api/webring.css">
 <webring>
-  <a href="http://localhost:8003" target="_blank">&lt;- Chiv's Website C</a>
-  <a href="http://localhost:8003" target="_blank">RANDOM</a>
-  <a href="http://localhost:8002" target="_blank">Chiv's Website B -&gt;</a>
+  <a href="${currentInstructionNeighbours.prev ? currentInstructionNeighbours.prev.url : 'url-for-previous-neighbour'}" target="_blank">&lt;- ${currentInstructionNeighbours.prev? currentInstructionNeighbours.prev.title : 'Title for Previous Neighbour'}</a>
+  <a href="${instructionRandomUrl}" target="_blank">RANDOM</a>
+  <a href="${currentInstructionNeighbours.next ? currentInstructionNeighbours.next.url : 'url-for-next-neighbour'}" target="_blank">&lt;- ${currentInstructionNeighbours.next? currentInstructionNeighbours.next.title : 'Title for Next Neighbour'}</a>
 </webring>
 `;
 
@@ -245,8 +254,8 @@ export default function Page() {
 
         <Tabs.Panel value="api">
           <Group justify='space-between' mt='xs'>
-            <Text>API endpoint</Text>
-            <CopyButton value={instructionApiUrl}>
+            <Text>Neighbours API endpoint</Text>
+            <CopyButton value={instructionNeighboursApiUrl}>
               {({ copied, copy }) => (
                 <Button variant='light' color={copied ? 'teal' : 'blue'} onClick={copy}>
                   {copied ? 'Copied URL' : 'Copy URL'}
@@ -254,7 +263,18 @@ export default function Page() {
               )}
             </CopyButton>
           </Group>
-          <Code block mt='xs'>{instructionApiUrl}</Code>
+          <Code block mt='xs'>{instructionNeighboursApiUrl}</Code>
+          <Group justify='space-between' mt='xs'>
+            <Text>Redirect to another random website on the ring</Text>
+            <CopyButton value={instructionRandomUrl}>
+              {({ copied, copy }) => (
+                <Button variant='light' color={copied ? 'teal' : 'blue'} onClick={copy}>
+                  {copied ? 'Copied URL' : 'Copy URL'}
+                </Button>
+              )}
+            </CopyButton>
+          </Group>
+          <Code block mt='xs'>{instructionRandomUrl}</Code>
         </Tabs.Panel>
 
         <Tabs.Panel value="html">
@@ -301,6 +321,32 @@ export default function Page() {
     </Modal>
   )
 
+  useEffect(() => {
+    const loadNeighbours = async () => {
+      try {
+        const response = await fetch(instructionNeighboursApiUrl_, {
+          method: 'GET',
+        });
+        const json = await response.json();
+        if (response.ok) {
+          setCurrentInstructionNeighbours(json);
+        } else {
+          alert(json.message);
+        }
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          alert(e.message);
+        } else {
+          throw e;
+        }
+      }
+    }
+    if (!instructionNeighboursApiUrl_.search) {
+      return;
+    }
+    loadNeighbours();
+  }, [currentInstructionWebsite]);
+
   const websiteList = websites.filter(website => website.approved).map(website => (
     <Card key={website.id} w='100%' withBorder>
       <Group justify='space-between'>
@@ -326,6 +372,9 @@ export default function Page() {
         <Text size="sm" c="dimmed">
           Added at: {website.addedAt}
         </Text >
+        <Text size="sm" c="dimmed">
+          Last API requested at: {website.requestedAt || 'Never'}
+        </Text>
       </Group>
     </Card>
   ));
@@ -339,9 +388,6 @@ export default function Page() {
         <Group>
           <ActionIcon variant="light" aria-label="Edit" onClick={() => { initialiseEditWebsiteForm(website) }}>
             <IconEdit />
-          </ActionIcon>
-          <ActionIcon variant="light" aria-label="View Instructions" onClick={() => { setCurrentInstructionWebsite(website); openInstruction() }}>
-            <IconFileInfo />
           </ActionIcon>
         </Group>
       </Group>

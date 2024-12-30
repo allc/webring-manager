@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -228,6 +228,44 @@ export class WebsitesService {
     }
 
     return result;
+  }
+
+  async findRandomWithCurrentUrl(currentUrl: string) {
+    const count = await this.prisma.website.count({
+      where: {
+        approved: true,
+        url: {
+          not: currentUrl,
+        }
+      },
+    });
+    const random = Math.floor(Math.random() * count);
+    const result = await this.prisma.website.findMany({
+      select: {
+        id: true,
+        url: true,
+        title: true,
+        description: true,
+        addedAt: true,
+        owner: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      where: {
+        approved: true,
+        url: {
+          not: currentUrl,
+        },
+      },
+      skip: random,
+      take: 1,
+    });
+    if (result.length == 0) {
+      return null;
+    }
+    return result[0];
   }
 
   updateRequestedAtWithUrl(url: string) {

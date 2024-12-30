@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, UseGuards, Request, NotFoundException, BadRequestException, Delete, Param, ForbiddenException, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards, Request, NotFoundException, BadRequestException, Delete, Param, ForbiddenException, Patch, Res } from '@nestjs/common';
 import { WebsitesService } from './websites.service';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
@@ -7,6 +7,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JwtAnonymousAuthGuard } from 'src/auth/jwt-anonymous.guard';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { Response } from 'express';
 
 @Controller('websites')
 @ApiTags('websites')
@@ -75,6 +76,9 @@ export class WebsitesController {
 
   @Get('neighbours')
   async findNeighbours(@Query('current') currentUrl: string) {
+    if (!currentUrl) {
+      throw new BadRequestException('Must have "current" query parameter');
+    }
     try {
       await this.websitesService.updateRequestedAtWithUrl(currentUrl);
     } catch(e) {
@@ -83,5 +87,22 @@ export class WebsitesController {
       }
     }
     return this.websitesService.findNeighboursWithCurrentUrl(currentUrl);
+  }
+
+  @Get('random')
+  @ApiQuery({ name: 'current', required: false })
+  async redirectRandom(@Res() res: Response, @Query('current') currentUrl: string) {
+    try {
+      await this.websitesService.updateRequestedAtWithUrl(currentUrl);
+    } catch(e) {
+      if (e !instanceof PrismaClientKnownRequestError && e.code !== 'P2025') {
+        throw e;
+      }
+    }
+    const randomWebsite = await this.websitesService.findRandomWithCurrentUrl(currentUrl);
+    if (!randomWebsite) {
+      throw new NotFoundException('No other websites in the ring');
+    }
+    return res.redirect(randomWebsite.url);
   }
 }
