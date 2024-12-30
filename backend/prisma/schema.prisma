@@ -32,8 +32,8 @@ model Website {
   ordering  Decimal @unique
   approved Boolean @default(false)
   requestAddAt DateTime @default(now())
-  addedAt  DateTime?
-  requestedAt  DateTime?
+  addedAt  DateTime? // Website added to the ring
+  requestedAt  DateTime? // API request time
   owner  User  @relation(fields: [ownerId], references: [id])
   ownerId Int
 }

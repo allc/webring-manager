@@ -3,6 +3,8 @@ export interface Website {
   title: string;
   url: string;
   description: string;
+  approved: boolean;
+  requestAddAt: string;
   addedAt: string;
   requestedAt: string;
   owner: {

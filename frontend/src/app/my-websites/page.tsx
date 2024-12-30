@@ -297,7 +297,7 @@ export default function Page() {
     </Modal>
   )
 
-  const websiteList = websites.map(website => (
+  const websiteList = websites.filter(website => website.approved).map(website => (
     <Card key={website.id} w='100%' withBorder>
       <Group justify='space-between'>
         <Text fw={500} component={Link} href={website.url} target='_blank'>
@@ -322,9 +322,35 @@ export default function Page() {
         <Text size="sm" c="dimmed">
           Added at: {website.addedAt}
         </Text >
-        <Text size="sm" c="dimmed">
-          Last API requested at: {website.requestedAt || 'Never'}
+      </Group>
+    </Card>
+  ));
+
+  const pendingWebsiteList = websites.filter(website => !website.approved).map(website => (
+    <Card key={website.id} w='100%' withBorder>
+      <Group justify='space-between'>
+        <Text fw={500} component={Link} href={website.url} target='_blank'>
+          {website.title}
         </Text>
+        <Group>
+          <ActionIcon variant="light" aria-label="Edit" onClick={() => { initialiseEditWebsiteForm(website) }}>
+            <IconEdit />
+          </ActionIcon>
+          <ActionIcon variant="light" aria-label="View Instructions" onClick={() => { setCurrentInstructionWebsite(website); openInstruction() }}>
+            <IconFileInfo />
+          </ActionIcon>
+        </Group>
+      </Group>
+      <Text size="sm" c="dimmed">
+        {website.url}
+      </Text>
+      <Text size="sm">
+        {website.description}
+      </Text>
+      <Group>
+        <Text size="sm" c="dimmed">
+          Requested adding at: {website.requestAddAt}
+        </Text >
       </Group>
     </Card>
   ));
@@ -348,6 +374,14 @@ export default function Page() {
       <Group mt="md">
         {websiteList}
       </Group>
+      { pendingWebsiteList.length > 0 &&
+        <>
+          <Text size="xl" mt="lg">Pending Approval</Text>
+          <Group mt="md">
+            {pendingWebsiteList}
+          </Group>
+        </>
+      }
     </>
   )
 }
