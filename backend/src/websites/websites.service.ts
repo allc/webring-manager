@@ -132,75 +132,101 @@ export class WebsitesService {
   }
 
   async findNeighboursWithCurrentUrl(currentUrl: string) {
-    const result = {
-      prev: null,
-      next: null,
-    };
-
-    const totalCount = await this.prisma.website.count();
-
     let currentOrdering = undefined;
-    if (currentUrl) {
-      const currentOrdering_ = await this.prisma.website.findMany({
+    try {
+      const currentOrdering_ = await this.prisma.website.findUniqueOrThrow({
         select: {
           ordering: true,
         },
         where: {
           url: currentUrl,
+          approved: true,
         },
       });
-      if (currentOrdering_.length > 0) {
-        // find prev and next
-        currentOrdering = currentOrdering_[0].ordering;
+      currentOrdering = currentOrdering_.ordering;
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+        throw new BadRequestException('Website with this URL is not in the ring');
       }
+      throw e;
     }
 
-    if (totalCount > 1 && currentOrdering) {
-      const index = await this.prisma.website.count({
-        where: {
-          ordering: {
-            lt: currentOrdering,
-          }
-        }
-      });
+    const result = {
+      prev: null,
+      next: null,
+    };
 
-      const prevSkip = index - 1 >= 0 ? index - 1 : totalCount - 1;
-      const prev = await this.prisma.website.findMany({
-        select: {
-          id: true,
-          url: true,
-          title: true,
-          description: true,
-          addedAt: true,
-        },
-        orderBy: {
-          ordering: 'asc',
-        },
-        skip: prevSkip,
-        take: 1,
-      });
-      // prev always exists (assuming atomic, though in reality there is a very little chance not)
-      result.prev = prev[0];
+    const totalCount = await this.prisma.website.count({
+      where: {
+        approved: true,
+      },
+    });
 
-      const nextSkip = index < totalCount - 1 ? index + 1 : 0;
-      const next = await this.prisma.website.findMany({
-        select: {
-          id: true,
-          url: true,
-          title: true,
-          description: true,
-          addedAt: true,
-        },
-        orderBy: {
-          ordering: 'asc',
-        },
-        skip: nextSkip,
-        take: 1,
-      });
-      // next always exists (assuming atomic, though in reality there is a very little chance not)
-      result.next = next[0];
+    if (totalCount < 2) {
+      return result;
     }
-  
+
+    const index = await this.prisma.website.count({
+      where: {
+        ordering: {
+          lt: currentOrdering,
+        },
+        approved: true,
+      }
+    });
+
+    const prevSkip = index - 1 >= 0 ? index - 1 : totalCount - 1;
+    const prev = await this.prisma.website.findMany({
+      select: {
+        id: true,
+        url: true,
+        title: true,
+        description: true,
+        addedAt: true,
+        owner: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      where: {
+        approved: true,
+      },
+      orderBy: {
+        ordering: 'asc',
+      },
+      skip: prevSkip,
+      take: 1,
+    });
+    // prev always exists (assuming atomic, though in reality there is a very little chance not)
+    result.prev = prev[0];
+
+    const nextSkip = index < totalCount - 1 ? index + 1 : 0;
+    const next = await this.prisma.website.findMany({
+      select: {
+        id: true,
+        url: true,
+        title: true,
+        description: true,
+        addedAt: true,
+        owner: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      where: {
+        approved: true,
+      },
+      orderBy: {
+        ordering: 'asc',
+      },
+      skip: nextSkip,
+      take: 1,
+    });
+    // next always exists (assuming atomic, though in reality there is a very little chance not)
+    result.next = next[0];
+
     return result;
   }
 

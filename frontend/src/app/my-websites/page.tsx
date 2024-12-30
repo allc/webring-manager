@@ -206,7 +206,7 @@ export default function Page() {
   )
 
   const instructionApiUrl_ = new URL(`${process.env.NEXT_PUBLIC_API_SERVER}/api/websites/neighbours`);
-  instructionApiUrl_.search = currentInstructionWebsite ? new URLSearchParams({currentUrl: currentInstructionWebsite.url}).toString() : new URLSearchParams({currentUrl: 'url'}).toString();
+  instructionApiUrl_.search = currentInstructionWebsite ? new URLSearchParams({current: currentInstructionWebsite.url}).toString() : new URLSearchParams({current: 'url'}).toString();
   const instructionApiUrl = instructionApiUrl_.toString();
 
   const instructionHtmlCode = `<link rel="stylesheet" href="http://localhost:3000/api/webring.css">
